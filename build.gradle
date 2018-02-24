@@ -1,0 +1,51 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion compile_sdk_version
+
+    defaultConfig {
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+
+    implementation "com.google.firebase:firebase-messaging:$google_services_version"
+    implementation "com.google.firebase:firebase-auth:$google_services_version"
+    implementation "com.google.firebase:firebase-config:$google_services_version"
+    compile "com.google.firebase:firebase-firestore:$google_services_version"
+
+    compile project(':kotlin-util')
+    compile project(':kotlin-promise')
+    compile project(':kotlin-observable')
+
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
+
+    implementation 'com.jakewharton.timber:timber:4.6.1'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "com.android.support:appcompat-v7:$android_support_version"
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
