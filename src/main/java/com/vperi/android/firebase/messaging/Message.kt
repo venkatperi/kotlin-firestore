@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package com.vperi.entity
+package com.vperi.android.firebase.messaging
 
-import com.vperi.kotlin.Event
-import com.vperi.promise.P
+import com.google.gson.Gson
 
-interface EntityCollection<T : Entity> :
-    MutableList<P<T>>, Query<T> {
+abstract class Message(val type: String) {
 
-  fun create(): P<T>?
-
-  fun findById(key: String): P<T>?
-
-  fun deleteById(key: String): P<T>?
-
-  val onChanged: Event<CollectionChanges<String, P<T>>>
-
-  val onError: Event<Exception>
+  fun toJSON(): String =
+      Gson().toJson(this)
 }
+
+
 

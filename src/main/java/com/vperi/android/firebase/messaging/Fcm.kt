@@ -1,9 +1,9 @@
-package com.vperi.android.firebase
+package com.vperi.android.firebase.messaging
 
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.Gson
+import com.vperi.android.firebase.Firebase
 import timber.log.Timber
-import java.util.UUID
+import java.util.*
 
 @Suppress("unused")
 class Fcm(private val senderId: String?) {
@@ -26,19 +26,6 @@ class Fcm(private val senderId: String?) {
             .Builder("$senderId@gcm.googleapis.com")
             .setMessageId(UUID.randomUUID().toString())
             .setData(data))
-  }
-
-  fun sendAppInstanceMessage(isNewUser: Boolean) {
-    val user = Firebase.currentUser
-    val instanceId = Firebase.instanceId
-    val appInstance = AppInstance(
-        userId = user!!.uid,
-        appInstanceId = instanceId.id,
-        instanceTokenId = instanceId.token!!,
-        isNewUser = isNewUser
-    )
-    sendUpstreamMessage(MESSAGE_APP_INSTANCE,
-        Gson().toJson(appInstance))
   }
 
   private fun sendUpstreamMessage(builder: RemoteMessage.Builder) {

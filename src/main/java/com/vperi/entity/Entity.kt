@@ -17,16 +17,18 @@
 package com.vperi.entity
 
 import com.vperi.kotlin.Event
-import java.util.Date
+import java.util.*
 
 interface Entity {
   var id: String
   val exists: Boolean
+  val createdOn: Date?
   val updatedOn: Date?
 
-  val reference: EntityRef<*>
+  fun <T : Entity> getReference(): EntityRef<T>
 
   val propertyChanged: Event<String>
   val entityChanged: Event<Void>
   val onError: Event<Exception>
 }
+

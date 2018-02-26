@@ -17,30 +17,19 @@
 package com.vperi.android.firebase.firestore.delegate
 
 import com.google.firebase.firestore.DocumentReference
+import com.vperi.android.firebase.firestore.converter.EntityRefConverter
 import com.vperi.android.firebase.firestore.entity.FirestoreEntity
-import com.vperi.android.firebase.firestore.entity.FirestoreEntityRef
 import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
 import com.vperi.entity.Entity
 import com.vperi.entity.EntityRef
-import kotlin.reflect.KProperty
 
 class FirestoreEntityRefDelegate<
-    in T : FirestoreEntity,
-    out X : Entity>
-(private val factory: FirestoreEntityFactory<X>) {
+    in T : FirestoreEntity, X : Entity>(
+    factory: FirestoreEntityFactory<X>) :
+    ReadWritePropertyDelegate<T, EntityRef<X>, DocumentReference>() {
 
-  private var value: EntityRef<X>? = null
+  override val converter = EntityRefConverter(factory)
 
-  operator fun getValue(thisRef: T,
-      property: KProperty<*>): EntityRef<X> {
-    if (value == null)
-      value =
-          FirestoreEntityRef(
-              thisRef.snapshot[property.name] as DocumentReference,
-              factory)
-    return value!!
-  }
 }
-
 
 

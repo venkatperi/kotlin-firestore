@@ -20,21 +20,21 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
-sealed class DbRef {
+sealed class CollectionContainer {
 
-  class Root(val store: FirebaseFirestore) : DbRef()
+  class Firestore(val store: FirebaseFirestore) : CollectionContainer()
 
-  class Document(val doc: DocumentReference) : DbRef()
+  class Document(val doc: DocumentReference) : CollectionContainer()
 
   fun collection(name: String): CollectionReference =
       when (this) {
-        is Root -> store.collection(name)
+        is Firestore -> store.collection(name)
         is Document -> doc.collection(name)
       }
 
   val path: String
     get() = when (this) {
-      is Root -> "$"
+      is Firestore -> "$"
       is Document -> doc.path
     }
 }

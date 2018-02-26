@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.vperi.android.firebase
+package com.vperi.android.firebase.messaging
 
-/**
- * Created by venkat on 2/15/18.
- */
-
-data class AppInstance(
+data class AppInstanceMessage(
     val userId: String,
-    val appInstanceId: String,
-    val instanceTokenId: String,
-    val isNewUser: Boolean
-)
+    val id: String,
+    val token: String
+) : Message("app_instance")

@@ -49,9 +49,13 @@ val DocumentSnapshot.safeData: Map<String, Any>?
 val DocumentSnapshot.dataHashCode: Int
   get() = safeData?.hashCode() ?: -1
 
-fun DocumentReference.setWithTimestamp(key: String, value: Any?): Task<Void> =
-    this.set(
-        mapOf(
-            key to value,
-            "updatedOn" to FieldValue.serverTimestamp()),
-        SetOptions.merge())
+fun DocumentReference.setWithTimestamp(key: String, value: Any?): Task<Void> {
+  val data = hashMapOf(key to value)
+  return setWithTimestamp(data)
+}
+
+fun DocumentReference.setWithTimestamp(data: HashMap<String, Any?>): Task<Void> {
+  data["updatedOn"] = FieldValue.serverTimestamp()
+  return this.set(data, SetOptions.merge())
+}
+

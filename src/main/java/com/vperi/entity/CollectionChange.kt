@@ -16,12 +16,28 @@
 
 package com.vperi.entity
 
-data class CollectionChange<out K, out V>(
-    val key: K,
-    val current: V?,
-    val old: V?,
-    val type: Type) {
-  enum class Type {
-    ADDED, REPLACED, REMOVED, MODIFIED
-  }
+typealias CollectionChanges<T, U> = Iterable<CollectionChange<T, U>>
+
+sealed class CollectionChange<out K, out V>(
+    val id: K,
+    val item: V,
+    val index: Int,
+    val upstream: Boolean) {
+
+  class Add<out K, out V>(id: K, item: V,
+      index: Int, upstream: Boolean = false) :
+      CollectionChange<K, V>(id, item, index, upstream)
+
+  class Modify<out K, out V>(id: K, item: V,
+      index: Int, upstream: Boolean = false) :
+      CollectionChange<K, V>(id, item, index, upstream)
+
+  class Remove<out K, out V>(id: K, item: V,
+      index: Int, upstream: Boolean = false) :
+      CollectionChange<K, V>(id, item, index, upstream)
+
+  class Move<out K, out V>(id: K, item: V,
+      index: Int, val oldIndex: Int,
+      upstream: Boolean = false) :
+      CollectionChange<K, V>(id, item, index, upstream)
 }

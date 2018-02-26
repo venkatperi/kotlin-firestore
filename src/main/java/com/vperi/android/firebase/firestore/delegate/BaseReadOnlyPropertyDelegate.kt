@@ -16,22 +16,36 @@
 
 package com.vperi.android.firebase.firestore.delegate
 
-import com.google.firebase.firestore.CollectionReference
-import com.vperi.android.firebase.firestore.converter.CollectionConverter
 import com.vperi.android.firebase.firestore.entity.FirestoreEntity
-import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityCollection
+import com.vperi.android.firebase.safeGet
 import kotlin.reflect.KProperty
 
-class FirestoreSubCollectionDelegate<
-    in T : FirestoreEntity,
-    X : Entity>(factory: FirestoreEntityFactory<X>) :
-    ReadOnlyPropertyDelegate<T, EntityCollection<X>, CollectionReference>() {
+abstract class BaseReadOnlyPropertyDelegate<
+    in T : FirestoreEntity, out L, R> : BaseReadOnlyDelegate<T, L, R>() {
 
-  override val converter = CollectionConverter(factory)
+  @Suppress("UNCHECKED_CAST")
+  override fun load(thisRef: T, property: KProperty<*>): R {
+    return thisRef.snapshot.safeGet(property.name) as R
+  }
 
-  override fun load(thisRef: T, property: KProperty<*>): CollectionReference =
-      thisRef.document.collection(property.name)
+  override fun beforeProvideDelegate(thisRef: T, prop: KProperty<*>) {
+    with(thisRef) {
+      entityChanged += {
+        refreshPropertyFromRemote(prop.name)
+      }
+    }
+  }
+
+  override operator fun getValue(thisRef: T, property: KProperty<*>): L =
+      with(thisRef) {
+        @Suppress("UNCHECKED_CAST")
+        properties.getOrPut(property.name, {
+          super.getValue(thisRef, property)
+        }) as L
+      }
 }
+
+
+
+
 

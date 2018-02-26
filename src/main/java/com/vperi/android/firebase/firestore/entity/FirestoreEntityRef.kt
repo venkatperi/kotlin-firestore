@@ -21,7 +21,7 @@ import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
 import com.vperi.entity.Entity
 import com.vperi.entity.EntityRef
 import com.vperi.promise.P
-import java.util.Objects
+import java.util.*
 
 class FirestoreEntityRef<out T : Entity>(
     internal val ref: DocumentReference,
