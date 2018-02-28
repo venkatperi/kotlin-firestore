@@ -29,7 +29,6 @@ class FirestoreEntityRefDelegate<
     ReadWritePropertyDelegate<T, EntityRef<X>, DocumentReference>() {
 
   override val converter = EntityRefConverter(factory)
-
 }
 
 

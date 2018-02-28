@@ -7,5 +7,5 @@ interface DelegateWriteSupport<in T, L, R> {
 
   val converter: ValueConverter<L, R>
 
-  fun save(thisRef: T, property: KProperty<*>, value: R)
+  fun save(thisRef: T, property: KProperty<*>, value: R?)
 }

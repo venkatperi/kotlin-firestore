@@ -28,8 +28,7 @@ class FirestoreEntityRef<out T : Entity>(
     private val factory: FirestoreEntityFactory<T>
 ) : EntityRef<T> {
 
-  override val path: String
-    get() = ref.path
+  override val path: String by lazy { ref.path }
 
   override fun get(): P<T> = factory.createInstance(ref)
 

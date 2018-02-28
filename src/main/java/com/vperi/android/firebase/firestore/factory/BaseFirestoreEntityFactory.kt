@@ -27,7 +27,8 @@ abstract class BaseFirestoreEntityFactory<out T : Entity>
 protected constructor() :
     FirestoreEntityFactory<T> {
 
-  override fun createInstance(collection: CollectionReference,
+  override fun createInstance(
+      collection: CollectionReference,
       id: String?): P<T> =
       createInstance(
           when (id) {

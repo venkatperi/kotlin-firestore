@@ -18,7 +18,6 @@ package com.vperi.android.firebase.firestore.entity
 
 import android.arch.lifecycle.LifecycleOwner
 import com.google.firebase.firestore.*
-import com.vperi.android.arch.lifecycle.AutoStartLifecycleHelper
 import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
 import com.vperi.android.firebase.promise
 import com.vperi.entity.CollectionChange
@@ -31,22 +30,17 @@ import nl.komponents.kovenant.Promise
 import timber.log.Timber
 
 open class FirestoreCollection<T : Entity>(
-//    db: CollectionContainer,
-//    name: String,
     collection: CollectionReference,
     factory: FirestoreEntityFactory<T>,
     owner: LifecycleOwner? = null) :
     BaseFirestoreCollection<T>(collection, factory, ArrayList<P<T>>()),
     EntityCollection<T> {
 
-  private val lifecycle = AutoStartLifecycleHelper(owner)
+//  private val lifecycle = AutoStartLifecycleHelper(owner)
 
   private val map = HashMap<String, P<T>>()
 
-  //  val path: String  by lazy { "${db.path}/$name" }
   val path: String by lazy { collection.path }
-
-//  private val collection by lazy { db.collection(name) }
 
   private fun document(id: String): DocumentReference =
       collection.document(id)
@@ -57,7 +51,7 @@ open class FirestoreCollection<T : Entity>(
 
   override fun create(): P<T>? =
       factory.createInstance(collection).apply {
-        success { map[it.id] = this }
+        success { map[it.id!!] = this }
       }
 
   override fun findById(key: String): P<T>? {
@@ -137,7 +131,9 @@ open class FirestoreCollection<T : Entity>(
   }
 
   init {
-    lifecycle.onStart += { collection.addSnapshotListener(::snapshotListener) }
+//    lifecycle.onStart += {
+    collection.addSnapshotListener(::snapshotListener)
+//    }
     onError += { Timber.e(it) }
   }
 }

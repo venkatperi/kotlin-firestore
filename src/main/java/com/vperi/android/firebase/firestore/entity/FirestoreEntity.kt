@@ -32,8 +32,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 abstract class FirestoreEntity(
     snap: DocumentSnapshot,
-    val factory: FirestoreEntityFactory<*>
-) : Entity {
+    val factory: FirestoreEntityFactory<*>) : Entity {
 
   private var snapshotHash: Int = snap.dataHashCode
 
@@ -76,7 +75,7 @@ abstract class FirestoreEntity(
 
   override val entityChanged = Event<Void>()
 
-  final override var id: String by FirestorePropertyDelegate()
+  final override var id: String? by FirestorePropertyDelegate()
 
   final override val updatedOn: Date? by FirestorePropertyDelegate()
 

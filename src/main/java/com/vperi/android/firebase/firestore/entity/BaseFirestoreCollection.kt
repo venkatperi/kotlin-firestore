@@ -6,8 +6,6 @@ import com.vperi.entity.Entity
 import com.vperi.promise.P
 
 open class BaseFirestoreCollection<T : Entity> internal constructor(
-//    db: CollectionContainer,
-//    protected val name: String,
     protected val collection: CollectionReference,
     protected val factory: FirestoreEntityFactory<T>,
     protected val values: ArrayList<P<T>>) : MutableList<P<T>> by values,

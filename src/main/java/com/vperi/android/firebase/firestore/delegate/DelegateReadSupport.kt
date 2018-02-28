@@ -7,5 +7,5 @@ interface DelegateReadSupport<in T, L, R> {
 
   val converter: ValueConverter<L, R>
 
-  fun load(thisRef: T, property: KProperty<*>): R
+  fun load(thisRef: T, property: KProperty<*>): R?
 }

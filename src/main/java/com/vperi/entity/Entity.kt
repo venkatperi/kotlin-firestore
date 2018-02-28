@@ -20,7 +20,7 @@ import com.vperi.kotlin.Event
 import java.util.*
 
 interface Entity {
-  var id: String
+  var id: String?
   val exists: Boolean
   val createdOn: Date?
   val updatedOn: Date?

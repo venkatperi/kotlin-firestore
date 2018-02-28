@@ -10,11 +10,15 @@ class CollectionConverter<X : Entity>(
     val factory: FirestoreEntityFactory<X>) :
     ValueConverter<EntityCollection<X>, CollectionReference> {
 
-  override fun convertBack(value: EntityCollection<X>): CollectionReference {
+  override fun convertBack(value: EntityCollection<X>?): CollectionReference? {
     throw IllegalStateException()
   }
 
-  override fun convert(value: CollectionReference): EntityCollection<X> =
-      FirestoreCollection(value, factory)
+  override fun convert(value: CollectionReference?): EntityCollection<X>? =
+      when (value) {
+        null -> null
+        else ->
+          FirestoreCollection(value, factory)
+      }
 }
 

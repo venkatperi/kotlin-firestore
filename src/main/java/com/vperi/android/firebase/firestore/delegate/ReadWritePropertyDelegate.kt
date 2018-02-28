@@ -7,9 +7,9 @@ import kotlin.reflect.KProperty
 abstract class ReadWritePropertyDelegate<in T : FirestoreEntity, L, R> :
     BaseReadWritePropertyDelegate<T, L, R>() {
 
-  operator fun provideDelegate(thisRef: T,
-      prop: KProperty<*>): ReadWriteProperty<T, L> {
-    beforeProvideDelegate(thisRef, prop)
+  operator fun provideDelegate(thisRef: T, prop: KProperty<*>):
+      ReadWriteProperty<T, L?> {
+    onInit(thisRef, prop)
     return this
   }
 }

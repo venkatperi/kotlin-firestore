@@ -7,8 +7,11 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.vperi.kotlin.Event
 
 open class LifecycleHelper(
-    owner: LifecycleOwner?,
-    autoStart: Boolean = false) : LifecycleObserver {
+    owner: LifecycleOwner? = null,
+    autoStart: Boolean = false
+) : LifecycleObserver {
+
+  private val lifecycleOwner = owner ?: SimpleLifecycleOwner(autoStart)
 
   val onStart = Event<Void>()
   val onStop = Event<Void>()
@@ -53,9 +56,24 @@ open class LifecycleHelper(
   }
 
   init {
-    when {
-      owner != null -> owner.lifecycle.addObserver(this)
-      autoStart -> start()
+//    onCreate.onListenerAdded!! += {
+//      if (lifecycleOwner.lifecycle.currentState <= Lifecycle.State.CREATED)
+//        (it!!)(null)
+//    }
+//
+//    onStart.onListenerAdded!! += {
+//      if (lifecycleOwner.lifecycle.currentState <= Lifecycle.State.STARTED)
+//        (it!!)(null)
+//    }
+
+    lifecycleOwner.lifecycle.addObserver(this)
+    val state = lifecycleOwner.lifecycle.currentState
+    if (state < Lifecycle.State.DESTROYED) {
+      if (state >= Lifecycle.State.CREATED)
+        onCreate()
+      if (state >= Lifecycle.State.STARTED)
+        onStart()
     }
+
   }
 }
