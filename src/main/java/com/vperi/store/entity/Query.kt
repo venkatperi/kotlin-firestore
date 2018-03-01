@@ -1,4 +1,4 @@
-package com.vperi.entity
+package com.vperi.store.entity
 
 import com.vperi.promise.P
 

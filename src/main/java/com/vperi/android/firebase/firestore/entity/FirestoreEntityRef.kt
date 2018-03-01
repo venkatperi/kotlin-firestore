@@ -17,20 +17,20 @@
 package com.vperi.android.firebase.firestore.entity
 
 import com.google.firebase.firestore.DocumentReference
-import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityRef
+import com.vperi.android.firebase.firestore.LazyFactory
 import com.vperi.promise.P
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.EntityRef
 import java.util.*
 
 class FirestoreEntityRef<out T : Entity>(
     internal val ref: DocumentReference,
-    private val factory: FirestoreEntityFactory<T>
+    private val factory: LazyFactory<T>
 ) : EntityRef<T> {
 
   override val path: String by lazy { ref.path }
 
-  override fun get(): P<T> = factory.createInstance(ref)
+  override fun get(): P<T> = factory.value.createInstance(ref)
 
   override fun equals(other: Any?): Boolean =
       when {

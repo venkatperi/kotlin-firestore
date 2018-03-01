@@ -19,7 +19,7 @@ package com.vperi.android.firebase.firestore.delegate
 import com.vperi.android.firebase.firestore.converter.PassthroughConverter
 import com.vperi.android.firebase.firestore.entity.FirestoreEntity
 
-open class FirestorePropertyDelegate<in T : FirestoreEntity, R> :
+open class FirestorePropertyDelegate<in T : FirestoreEntity, R : Any> :
     ReadWritePropertyDelegate<T, R, R>() {
 
   override val converter = PassthroughConverter<R, R>()

@@ -17,15 +17,15 @@
 package com.vperi.android.firebase.firestore.delegate
 
 import com.google.firebase.firestore.DocumentReference
+import com.vperi.android.firebase.firestore.LazyFactory
 import com.vperi.android.firebase.firestore.converter.EntityRefConverter
 import com.vperi.android.firebase.firestore.entity.FirestoreEntity
-import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityRef
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.EntityRef
 
 class FirestoreEntityRefDelegate<
     in T : FirestoreEntity, X : Entity>(
-    factory: FirestoreEntityFactory<X>) :
+    factory: LazyFactory<X>) :
     ReadWritePropertyDelegate<T, EntityRef<X>, DocumentReference>() {
 
   override val converter = EntityRefConverter(factory)

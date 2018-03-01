@@ -7,7 +7,7 @@ import android.arch.lifecycle.OnLifecycleEvent
 import com.vperi.kotlin.Event
 
 open class LifecycleHelper(
-    owner: LifecycleOwner? = null,
+    val owner: LifecycleOwner? = null,
     autoStart: Boolean = false
 ) : LifecycleObserver {
 
@@ -22,7 +22,7 @@ open class LifecycleHelper(
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   fun start() {
-    onStart()
+    onStart(sticky = true)
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
@@ -32,7 +32,7 @@ open class LifecycleHelper(
 
   @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
   fun create() {
-    onCreate()
+    onCreate(sticky = true)
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
@@ -42,7 +42,7 @@ open class LifecycleHelper(
 
   @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
   fun resume() {
-    onResume()
+    onResume(sticky = true)
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -69,10 +69,12 @@ open class LifecycleHelper(
     lifecycleOwner.lifecycle.addObserver(this)
     val state = lifecycleOwner.lifecycle.currentState
     if (state < Lifecycle.State.DESTROYED) {
-      if (state >= Lifecycle.State.CREATED)
-        onCreate()
-      if (state >= Lifecycle.State.STARTED)
-        onStart()
+      when {
+        state >= Lifecycle.State.CREATED -> create()
+      }
+      when {
+        state >= Lifecycle.State.STARTED -> start()
+      }
     }
 
   }

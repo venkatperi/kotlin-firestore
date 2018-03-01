@@ -1,15 +1,15 @@
 package com.vperi.android.firebase.firestore.entity
 
-import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
+import com.vperi.android.firebase.firestore.LazyFactory
 import com.vperi.android.firebase.promise
-import com.vperi.entity.Entity
-import com.vperi.entity.Query
 import com.vperi.promise.P
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.Query
 import nl.komponents.kovenant.then
 
 class FirestoreQuery<T : Entity>(
     private var query: com.google.firebase.firestore.Query,
-    private val factory: FirestoreEntityFactory<T>
+    private val factory: LazyFactory<T>
 ) : Query<T> {
 
   override fun whereEqualTo(field: String, value: Any): Query<T> {
@@ -73,6 +73,10 @@ class FirestoreQuery<T : Entity>(
 
   override fun get(): P<Iterable<T>> {
     return query.get().promise
-        .then { it.map(factory::createInstance) }
+        .then {
+          it.map {
+            factory.value.createInstance(it)
+          }
+        }
   }
 }

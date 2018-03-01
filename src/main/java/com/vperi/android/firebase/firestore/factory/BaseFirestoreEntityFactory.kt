@@ -19,8 +19,8 @@ package com.vperi.android.firebase.firestore.factory
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.vperi.android.firebase.promise
-import com.vperi.entity.Entity
 import com.vperi.promise.P
+import com.vperi.store.entity.Entity
 import nl.komponents.kovenant.then
 
 abstract class BaseFirestoreEntityFactory<out T : Entity>

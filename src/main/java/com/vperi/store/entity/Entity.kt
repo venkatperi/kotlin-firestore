@@ -14,22 +14,41 @@
  * limitations under the License.
  */
 
-package com.vperi.entity
+package com.vperi.store.entity
 
 import com.vperi.kotlin.Event
-import com.vperi.promise.P
+import java.util.*
 
-interface EntityCollection<T : Entity> :
-    MutableList<P<T>>, Query<T> {
+/**
+ * Base from which Firestore entities derive
+ *
+ */
+interface Entity {
 
-  fun create(): P<T>?
+  /**
+   * @property String The unique id of this entity
+   */
+  var id: String
 
-  fun findById(key: String): P<T>?
+  /**
+   * @property Boolean true if this entity exists in the Firestore collection
+   */
+  val exists: Boolean
 
-  fun deleteById(key: String): P<T>?
+  /**
+   * @property createdOn date when this record was created
+   */
+  val createdOn: Date?
 
-  val onChanged: Event<CollectionChanges<String, P<T>>>
+  /**
+   * @property updatedOn date when this record was modified
+   */
+  val updatedOn: Date?
 
+  fun <T : Entity> getReference(klass: Class<T>): EntityRef<T>
+
+  val propertyChanged: Event<String>
+  val entityChanged: Event<Void>
   val onError: Event<Exception>
 }
 

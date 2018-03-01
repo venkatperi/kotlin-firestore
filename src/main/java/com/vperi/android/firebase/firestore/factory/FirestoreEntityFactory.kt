@@ -19,8 +19,8 @@ package com.vperi.android.firebase.firestore.factory
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
-import com.vperi.entity.Entity
 import com.vperi.promise.P
+import com.vperi.store.entity.Entity
 
 interface FirestoreEntityFactory<out T : Entity> {
   fun createInstance(collection: CollectionReference, id: String? = null): P<T>

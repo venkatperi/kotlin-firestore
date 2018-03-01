@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package com.vperi.entity
+package com.vperi.store.entity
 
 import com.vperi.kotlin.Event
-import java.util.*
+import com.vperi.promise.P
 
-interface Entity {
-  var id: String?
-  val exists: Boolean
-  val createdOn: Date?
-  val updatedOn: Date?
+interface EntityCollection<T : Entity> :
+    MutableList<P<T>>, Query<T> {
 
-  fun <T : Entity> getReference(): EntityRef<T>
+  fun create(): P<T>?
 
-  val propertyChanged: Event<String>
-  val entityChanged: Event<Void>
+  fun findById(key: String): P<T>?
+
+  fun deleteById(key: String): P<T>?
+
+  val onChanged: Event<CollectionChanges<String, P<T>>>
+
   val onError: Event<Exception>
 }
 

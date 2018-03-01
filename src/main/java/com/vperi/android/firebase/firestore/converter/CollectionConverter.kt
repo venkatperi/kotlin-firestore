@@ -1,24 +1,20 @@
 package com.vperi.android.firebase.firestore.converter
 
 import com.google.firebase.firestore.CollectionReference
+import com.vperi.android.firebase.firestore.LazyFactory
 import com.vperi.android.firebase.firestore.entity.FirestoreCollection
-import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityCollection
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.EntityCollection
 
 class CollectionConverter<X : Entity>(
-    val factory: FirestoreEntityFactory<X>) :
+    val factory: LazyFactory<X>) :
     ValueConverter<EntityCollection<X>, CollectionReference> {
 
-  override fun convertBack(value: EntityCollection<X>?): CollectionReference? {
+  override fun convertBack(value: EntityCollection<X>): CollectionReference {
     throw IllegalStateException()
   }
 
-  override fun convert(value: CollectionReference?): EntityCollection<X>? =
-      when (value) {
-        null -> null
-        else ->
-          FirestoreCollection(value, factory)
-      }
+  override fun convert(value: CollectionReference): EntityCollection<X> =
+      FirestoreCollection(value, factory)
 }
 

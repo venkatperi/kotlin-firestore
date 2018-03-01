@@ -1,11 +1,11 @@
 package com.vperi.gpslogger.adapter
 
 import android.support.v7.widget.RecyclerView
-import com.vperi.entity.CollectionChange
-import com.vperi.entity.CollectionChanges
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityCollection
 import com.vperi.promise.P
+import com.vperi.store.entity.CollectionChange
+import com.vperi.store.entity.CollectionChanges
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.EntityCollection
 
 abstract class EntityCollectionRecyclerAdapter<
     in T : Entity,
@@ -32,6 +32,5 @@ abstract class EntityCollectionRecyclerAdapter<
 
   init {
     collection.onChanged += ::onChanged
-//    collection.onChanged -= ::onChanged
   }
 }

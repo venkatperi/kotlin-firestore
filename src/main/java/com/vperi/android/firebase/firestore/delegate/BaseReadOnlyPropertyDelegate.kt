@@ -18,6 +18,7 @@ package com.vperi.android.firebase.firestore.delegate
 
 import com.vperi.android.firebase.firestore.entity.FirestoreEntity
 import com.vperi.android.firebase.safeGet
+import com.vperi.store.delegate.BaseReadOnlyDelegate
 import kotlin.reflect.KProperty
 
 abstract class BaseReadOnlyPropertyDelegate<
@@ -25,26 +26,16 @@ abstract class BaseReadOnlyPropertyDelegate<
     BaseReadOnlyDelegate<T, L, R>() {
 
   @Suppress("UNCHECKED_CAST")
-  override fun load(thisRef: T, property: KProperty<*>): R? =
-      thisRef.snapshot.safeGet(property.name) as R?
+  override fun load(thisRef: T, property: KProperty<*>): R =
+      thisRef.snapshot.safeGet(property.name) as R
 
   override fun onInit(thisRef: T, prop: KProperty<*>) = with(thisRef) {
     entityChanged += {
       refreshPropertyFromRemote(prop.name)
     }
   }
-
-  override operator fun getValue(thisRef: T, property: KProperty<*>): L? =
-      with(thisRef) {
-        @Suppress("UNCHECKED_CAST")
-        var value: L? = properties[property.name] as L?
-        if (value == null) {
-          value = super.getValue(thisRef, property)
-          if (value != null) properties[property.name] = value
-        }
-        value
-      }
 }
+
 
 
 

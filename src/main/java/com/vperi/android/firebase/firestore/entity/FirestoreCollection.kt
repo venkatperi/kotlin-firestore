@@ -18,25 +18,26 @@ package com.vperi.android.firebase.firestore.entity
 
 import android.arch.lifecycle.LifecycleOwner
 import com.google.firebase.firestore.*
-import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
+import com.vperi.android.arch.lifecycle.AutoStartLifecycleHelper
+import com.vperi.android.firebase.firestore.LazyFactory
 import com.vperi.android.firebase.promise
-import com.vperi.entity.CollectionChange
-import com.vperi.entity.CollectionChanges
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityCollection
 import com.vperi.kotlin.Event
 import com.vperi.promise.P
+import com.vperi.store.entity.CollectionChange
+import com.vperi.store.entity.CollectionChanges
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.EntityCollection
 import nl.komponents.kovenant.Promise
 import timber.log.Timber
 
 open class FirestoreCollection<T : Entity>(
     collection: CollectionReference,
-    factory: FirestoreEntityFactory<T>,
+    factory: LazyFactory<T>,
     owner: LifecycleOwner? = null) :
     BaseFirestoreCollection<T>(collection, factory, ArrayList<P<T>>()),
     EntityCollection<T> {
 
-//  private val lifecycle = AutoStartLifecycleHelper(owner)
+  private val lifecycle = AutoStartLifecycleHelper(owner)
 
   private val map = HashMap<String, P<T>>()
 
@@ -50,14 +51,14 @@ open class FirestoreCollection<T : Entity>(
   final override val onError = Event<Exception>()
 
   override fun create(): P<T>? =
-      factory.createInstance(collection).apply {
-        success { map[it.id!!] = this }
+      factory.value.createInstance(collection).apply {
+        success { map[it.id] = this }
       }
 
   override fun findById(key: String): P<T>? {
     Timber.d("findById: $path/$key")
     return map.getOrPut(key, {
-      factory.createInstance(collection, key)
+      factory.value.createInstance(collection, key)
     })
   }
 
@@ -74,36 +75,31 @@ open class FirestoreCollection<T : Entity>(
     return query.get()
   }
 
-  private fun onDocumentAdded(change: DocumentChange):
-      List<CollectionChange<String, P<T>>> {
-    val doc = change.document
+  private fun onDocumentAdded(doc: DocumentSnapshot, newIndex: Int, oldIndex: Int):
+      CollectionChanges<String, P<T>> {
     val item = map.getOrPut(doc.id, { createInstance(doc) })
-    values.add(change.newIndex, item)
-    return listOf(CollectionChange.Add(doc.id, item, change.newIndex, true))
+    values.add(newIndex, item)
+    return listOf(CollectionChange.Add(doc.id, item, newIndex, true))
   }
 
-  private fun onDocumentRemoved(change: DocumentChange):
-      List<CollectionChange<String, P<T>>> {
-    val doc = change.document
+  private fun onDocumentRemoved(doc: DocumentSnapshot, newIndex: Int, oldIndex: Int):
+      CollectionChanges<String, P<T>> {
     val item = map[doc.id]!!
-    values.removeAt(change.newIndex)
+    values.removeAt(newIndex)
     map.remove(doc.id)
-    return listOf(CollectionChange.Remove(doc.id, item, change.newIndex, true))
+    return listOf(CollectionChange.Remove(doc.id, item, newIndex, true))
   }
 
-  private fun onDocumentModified(change: DocumentChange):
-      List<CollectionChange<String, P<T>>> {
-    val doc = change.document
+  private fun onDocumentModified(doc: DocumentSnapshot, newIndex: Int, oldIndex: Int):
+      CollectionChanges<String, P<T>> {
     val item = map[doc.id]!!
-    val index = change.newIndex
-    val oldIndex = change.oldIndex
     val changes = arrayListOf<CollectionChange<String, P<T>>>()
-    if (index != oldIndex) {
+    if (newIndex != oldIndex) {
       values.removeAt(oldIndex)
-      values.add(index, item)
-      changes.add(CollectionChange.Move(doc.id, item, index, oldIndex, true))
+      values.add(newIndex, item)
+      changes.add(CollectionChange.Move(doc.id, item, newIndex, oldIndex, true))
     }
-    changes.add(CollectionChange.Modify(doc.id, item, index, true))
+    changes.add(CollectionChange.Modify(doc.id, item, newIndex, true))
     return changes
   }
 
@@ -114,7 +110,7 @@ open class FirestoreCollection<T : Entity>(
   )
 
   private fun createInstance(doc: DocumentSnapshot): P<T> =
-      Promise.of(factory.createInstance(doc))
+      Promise.of(factory.value.createInstance(doc))
 
   private fun snapshotListener(
       items: QuerySnapshot,
@@ -123,7 +119,8 @@ open class FirestoreCollection<T : Entity>(
       e != null -> onError(e)
       !items.isEmpty -> {
         val changes = items.documentChanges.map {
-          changeHandlers[it.type]!!.invoke(it)
+          Timber.d("${it.type.name}, ${it.oldIndex}/${it.newIndex}: ${it.document.reference.path}")
+          changeHandlers[it.type]!!.invoke(it.document, it.newIndex, it.oldIndex)
         }.flatten()
         onChanged(changes)
       }

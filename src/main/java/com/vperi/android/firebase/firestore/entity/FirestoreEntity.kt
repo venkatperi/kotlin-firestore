@@ -17,22 +17,30 @@
 package com.vperi.android.firebase.firestore.entity
 
 import android.annotation.SuppressLint
+import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.KodeinAware
+import com.github.salomonbrys.kodein.instance
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.vperi.android.firebase.*
+import com.vperi.android.firebase.firestore.delegate.FirestoreNullablePropertyDelegate
 import com.vperi.android.firebase.firestore.delegate.FirestorePropertyDelegate
 import com.vperi.android.firebase.firestore.factory.FirestoreEntityFactory
-import com.vperi.entity.Entity
-import com.vperi.entity.EntityRef
 import com.vperi.kotlin.Event
+import com.vperi.store.FirestoreEntityManager
+import com.vperi.store.entity.Entity
+import com.vperi.store.entity.EntityRef
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-abstract class FirestoreEntity(
-    snap: DocumentSnapshot,
-    val factory: FirestoreEntityFactory<*>) : Entity {
+abstract class FirestoreEntity(snap: DocumentSnapshot) :
+    Entity, KodeinAware {
+
+  final override val kodein: Kodein by lazy {
+    FirestoreEntityManager.instance.kodein
+  }
 
   private var snapshotHash: Int = snap.dataHashCode
 
@@ -61,8 +69,11 @@ abstract class FirestoreEntity(
   val path: String
     get() = document.path
 
-  override fun <T : Entity> getReference(): EntityRef<T> =
-      FirestoreEntityRef(document, factory as FirestoreEntityFactory<T>)
+  override fun <T : Entity> getReference(klass: Class<T>): EntityRef<T> =
+      FirestoreEntityRef(document,
+          lazy {
+            kodein.instance<FirestoreEntityFactory<T>>(klass)
+          })
 
   final override val exists
     get() = snapshot.exists()
@@ -75,11 +86,11 @@ abstract class FirestoreEntity(
 
   override val entityChanged = Event<Void>()
 
-  final override var id: String? by FirestorePropertyDelegate()
+  final override var id: String by FirestorePropertyDelegate()
 
-  final override val updatedOn: Date? by FirestorePropertyDelegate()
+  final override val updatedOn: Date? by FirestoreNullablePropertyDelegate()
 
-  final override val createdOn: Date? by FirestorePropertyDelegate()
+  final override val createdOn: Date? by FirestoreNullablePropertyDelegate()
 
   fun refreshPropertyFromRemote(name: String) {
     properties.remove(name)
